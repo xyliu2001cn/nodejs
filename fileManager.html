@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>文件管理系统</title>
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.1.1/jquery.min.js"></script>
+	<style type="text/css">
+		#path {
+			width: 600px;
+			margin-right: 5px;
+		}
+
+	</style>
+</head>
+<body>
+	<div class="container">
+		<!-- 当前路径或要跳转路径 -->
+		<div>
+			<input type="text" id="path" value="/"><button type="button" >go</button><br>
+			<span id="msg"></span>
+		</div>
+		<div id="result">
+			
+		</div>
+	</div>
+	<script type="text/javascript">
+		$("button").click(function(){
+			skip($("#path").val());
+		});
+
+		var skip = function(path) {
+			var requestUrl = "list?path=" + path;
+			$.getJSON(requestUrl, function(result){
+				renderList(result["files"]);
+				$("#path").val(result["dir"])
+			});
+		}
+
+		var renderList = function (list) {
+			var buff = [];
+
+			if (list) {
+				list.forEach(function(element, index , array) {
+					if (element.isFile) {
+						buff.push("<li>" + element.name + "</li>");
+					} else {
+						buff.push("<li><a href='#' full='" + element.fullname + "'> " + element.name + "</a></li>");
+					}					
+				});
+				buff.unshift("<ul>");
+				buff.push("</ul>");
+			}
+
+			$("#result").html(buff.join(""));
+
+			$("#result a").click(function() {
+				skip($(this).attr("full"));
+			});
+		}
+	</script>
+</body>
+</html>
